@@ -1,86 +1,186 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Aplicion de empleados contagiados</title>
+    <title>Calculador de Contagios de la Empresa </title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='bridget.png') }}">
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9; /* Color de fondo para los lados */
+        }
+
+        .container {
+            background-color: #ffffff; /* Fondo blanco para el contenido principal */
+            max-width: 800px;
             margin: 50px auto;
             padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para darle profundidad */
+            border: 1px solid #ddd;
         }
-        .container {
-            border: 1px solid #ccc;
-            padding: 20px;
-            border-radius: 5px;
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 20px;
         }
+
+        h2 {
+            color: #555;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
         input[type="text"] {
-            width: 70%;
-            padding: 8px;
-            margin-right: 10px;
-        }
-        button {
-            padding: 8px 20px;
-        }
-        .resultado {
-            margin-top: 20px;
+            width: calc(100% - 150px);
             padding: 10px;
-            background-color: #f0f0f0;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .resultado, .dias-container, .comparacion-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
             border-radius: 5px;
         }
+
         .matrix-container {
-            overflow-x: auto; /* Permite el desplazamiento horizontal */
-            overflow-y: auto; /* Permite el desplazamiento vertical */
-            max-height: 300px; /* Establece un límite de altura */
-            margin-top: 10px;
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 300px;
+            margin-top: 20px;
         }
+
         .matrix-table {
             border-collapse: collapse;
-            width: 100%; /* Ajusta el ancho de la tabla */
-            max-width: 100%; /* Evita que se desborde */
+            width: 100%;
+            max-width: 100%;
         }
+
         .matrix-table td, .matrix-table th {
             border: 1px solid #ccc;
             padding: 8px;
             text-align: center;
         }
+
+        .btn-download {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #fff;
+            background-color: #28a745;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .btn-download:hover {
+            background-color: #218838;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #777;
+        }
+        .icon-bridget {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 60px; 
+            height: 60px;
+            border-radius: 50%; /* Bridget pequeña y redondeada */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra prq si */
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Bienvenindo al calculador de contagios</h1>
-        <h2>Ingrese numero de trabajadores entre 60 y 120</h2>
+        <h1>Calculador de Contagios</h1>
+
+        <!-- Formulario para ingresar el número de empleados -->
+        <h2>Ingrese número de trabajadores entre 60 y 120</h2>
         <form method="POST">
             <input type="text" name="input_text" placeholder="Escribe aquí..." required>
-            <button type="submit">Mostrar</button>
+            <button type="submit">Generar Matriz</button>
         </form>
 
         {% if texto %}
         <div class="resultado">
-            <h3>Numero de trabajadores ingresados:</h3>
+            <h3>Número de trabajadores ingresados:</h3>
             <h3>{{ texto }}</h3>
-            {% if matriz is not none %}
-            <div class="matrix-container">
-                <h3>Matriz:</h3>
-                <table class="matrix-table">
-                    {% for row in matriz %}
-                    <tr>
-                        {% for cell in row %}
-                        <td>{{ cell }}</td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-                {% if comparacion is not none %}
-                <div class="comparacion-container">
-                    <h3>{{ comparacion }} </h3>
-                </div>
-                {% endif %}
-            {% endif %}
         </div>
         {% endif %}
+
+        <!-- Mostrar la matriz si ya está generada -->
+        {% if matriz is not none %}
+        <div class="matrix-container">
+            <h3>Matriz:</h3>
+            <table class="matrix-table">
+                {% for row in matriz %}
+                <tr>
+                    {% for cell in row %}
+                    <td>{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <!-- Botón para descargar la matriz -->
+        <a href="/download" class="btn-download">Descargar Matriz</a>
+
+        {% if comparacion is not none %}
+        <div class="comparacion-container">
+            <h3>{{ comparacion }}</h3>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <!-- Ingresar el porcentaje -->
+        {% if matriz is not none %}
+        <h2>Ingrese porcentaje de trabajadores para calcular en cuántos días se llegará a ese porcentaje</h2>
+        <form method="POST">
+            <input type="text" name="input_porcentaje" placeholder="Escribe aquí..." required>
+            <button type="submit">Calcular Días</button>
+        </form>
+        {% if dias is not none %}
+        <div class="dias-container">
+            <h3>Días necesarios para alcanzar el {{ porcentaje }}% de contagio:</h3>
+            <h3>{{ dias }}</h3>
+        </div>
+        {% endif %}
+        {% endif %}
     </div>
+
+    <footer>
+        &copy; 2025 Calculador de Contagios. Creado por Estanislao y Enzo. Jaja copyright, vulnerable a xss
+    </footer>
+    <img src="{{ url_for('static', filename='bridget.png') }}" alt="Bridget Icon" class="icon-bridget">
 </body>
 </html>
